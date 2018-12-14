@@ -10,7 +10,8 @@ var bodyParser = require('body-parser');
 var bluebird = require('bluebird');
 var logger = require('./Logger');
 
-var ProviderUtils = require('./lib/utils.js');
+//var ProviderUtils = require('./lib/utils.js');
+var ProviderTriggersManager = require('./lib/triggers_manager.js');
 var ProviderHealth = require('./lib/health.js');
 var ProviderRAS = require('./lib/ras.js');
 var ProviderActivation = require('./lib/active.js');
@@ -33,11 +34,21 @@ var dbHost = process.env.DB_HOST;
 var dbProtocol = process.env.DB_PROTOCOL;
 var dbPrefix = process.env.DB_PREFIX;
 var databaseName = dbPrefix + constants.TRIGGER_DB_SUFFIX;
+// OPTIONAL
 var redisUrl = process.env.REDIS_URL;
+
+// OPTIONAL
 var monitoringAuth = process.env.MONITORING_AUTH;
 var monitoringInterval = process.env.MONITORING_INTERVAL || constants.MONITOR_INTERVAL;
+
 var filterDDName = '_design/' + constants.FILTERS_DESIGN_DOC;
 var viewDDName = '_design/' + constants.VIEWS_DESIGN_DOC;
+
+if (!process.env.EVENT_PROVIDER) {
+  throw new Exception('Missing EVENT_PROVIDER environment parameter.')
+}
+
+const EventProvider = require(process.env.EVENT_PROVIDER)
 
 // Create the Provider Server
 var server = http.createServer(app);
@@ -49,6 +60,7 @@ function createDatabase() {
     var method = 'createDatabase';
     logger.info(method, 'creating the trigger database');
 
+    console.log(dbProtocol + '://' + dbUsername + ':' + dbPassword + '@' + dbHost);
     var cloudant = require('@cloudant/cloudant')(dbProtocol + '://' + dbUsername + ':' + dbPassword + '@' + dbHost);
 
     if (cloudant !== null) {
@@ -179,10 +191,10 @@ function createRedisClient() {
 }
 
 // Initialize the Provider Server
-function init(server) {
+function init(server, EventProvider) {
     var method = 'init';
     var cloudantDb;
-    var providerUtils;
+    var providerTriggersManager;
 
     if (server !== null) {
         var address = server.address();
@@ -198,24 +210,24 @@ function init(server) {
         return createRedisClient();
     })
     .then(client => {
-        providerUtils = new ProviderUtils(logger, cloudantDb, client);
-        return providerUtils.initRedis();
+        providerTriggersManager = new ProviderTriggersManager(logger, cloudantDb, EventProvider, client);
+        return providerTriggersManager.initRedis();
     })
     .then(() => {
         var providerRAS = new ProviderRAS();
-        var providerHealth = new ProviderHealth(logger, providerUtils);
-        var providerActivation = new ProviderActivation(logger, providerUtils);
+        var providerHealth = new ProviderHealth(logger, providerTriggersManager);
+        var providerActivation = new ProviderActivation(logger, providerTriggersManager);
 
         // RAS Endpoint
         app.get(providerRAS.endPoint, providerRAS.ras);
 
         // Health Endpoint
-        app.get(providerHealth.endPoint, providerUtils.authorize, providerHealth.health);
+        app.get(providerHealth.endPoint, providerTriggersManager.authorize, providerHealth.health);
 
         // Activation Endpoint
-        app.get(providerActivation.endPoint, providerUtils.authorize, providerActivation.active);
+        app.get(providerActivation.endPoint, providerTriggersManager.authorize, providerActivation.active);
 
-        providerUtils.initAllTriggers();
+        providerTriggersManager.initAllTriggers();
 
         if (monitoringAuth) {
             setInterval(function () {
@@ -229,4 +241,4 @@ function init(server) {
 
 }
 
-init(server);
+init(server, EventProvider);

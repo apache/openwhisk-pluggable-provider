@@ -17,10 +17,14 @@ function main(msg) {
     var endpoint = msg.apihost;
     var webparams = common.createWebParams(msg);
 
-    var url = `https://${endpoint}/api/v1/web/whisk.system/cloudantWeb/changesWebAction.http`;
+    const provider = msg.EVENT_PROVIDER
+
+  // SHOULD BE GENERIC
+    var url = `https://${endpoint}/api/v1/web/${process.env['__OW_NAMESPACE']}/${provider}-web/changesWebAction.http`;
 
     if (lifecycleEvent in eventMap) {
         var method = eventMap[lifecycleEvent];
+        console.log(url, webparams, method)
         return common.requestHelper(url, webparams, method);
     } else {
         return Promise.reject('unsupported lifecycleEvent');

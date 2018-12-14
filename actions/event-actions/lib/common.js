@@ -46,6 +46,7 @@ function createWebParams(rawParams) {
     delete webparams.lifecycleEvent;
     delete webparams.bluemixServiceName;
     delete webparams.apihost;
+    delete webparams.EVENT_PROVIDER;
 
     webparams.triggerName = triggerName;
     webparams.authKey = process.env.__OW_API_KEY;
@@ -96,16 +97,20 @@ function parseQName(qname, separator) {
 }
 
 function sendError(statusCode, error, message) {
-    var params = {error: error};
-    if (message) {
-        params.message = message;
-    }
+  const params = {error: error};
+  if (message) {
+    params.message = message;
+  }
 
-    return {
-        statusCode: statusCode,
-        headers: { 'Content-Type': 'application/json' },
-        body: params
-    };
+  return sendResponse(statusCode, params)
+}
+
+function sendResponse(statusCode = 200, body = {'status': 'success'}) {
+  return {
+    statusCode,
+    headers: {'Content-Type': 'application/json'},
+    body
+  };
 }
 
 function constructObject(data) {
@@ -133,5 +138,6 @@ module.exports = {
     'verifyTriggerAuth': verifyTriggerAuth,
     'parseQName': parseQName,
     'sendError': sendError,
+    'sendResponse': sendResponse,
     'constructObject': constructObject
 };
