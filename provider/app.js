@@ -28,10 +28,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // If it does not already exist, create the triggers database.  This is the database that will
 // store the managed triggers.
-var dbUsername = process.env.DB_USERNAME;
-var dbPassword = process.env.DB_PASSWORD;
-var dbHost = process.env.DB_HOST;
-var dbProtocol = process.env.DB_PROTOCOL;
+var dbUrl = process.env.DB_URL;
 var dbPrefix = process.env.DB_PREFIX;
 var databaseName = dbPrefix + constants.TRIGGER_DB_SUFFIX;
 // OPTIONAL
@@ -60,8 +57,8 @@ function createDatabase() {
     var method = 'createDatabase';
     logger.info(method, 'creating the trigger database');
 
-    console.log(dbProtocol + '://' + dbUsername + ':' + dbPassword + '@' + dbHost);
-    var cloudant = require('@cloudant/cloudant')(dbProtocol + '://' + dbUsername + ':' + dbPassword + '@' + dbHost);
+    console.log(dbUrl);
+    var cloudant = require('@cloudant/cloudant')(dbUrl);
 
     if (cloudant !== null) {
         return new Promise(function (resolve, reject) {
@@ -126,7 +123,7 @@ function createDatabase() {
         });
     }
     else {
-        Promise.reject('cloudant provider did not get created.  check db URL: ' + dbHost);
+        Promise.reject('cloudant provider did not get created.  check db URL: ' + dbUrl);
     }
 }
 

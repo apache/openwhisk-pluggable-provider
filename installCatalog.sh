@@ -13,16 +13,15 @@ set -x
 WSK_CLI="$OPENWHISK_HOME/bin/wsk"
 
 if [ $# -eq 0 ]; then
-    echo "Usage: ./installCatalog.sh <event_provider> <authkey> <edgehost> <dburl> <dbprefix> <apihost> <workers>"
+    echo "Usage: ./installCatalog.sh <authkey> <edgehost> <dburl> <dbtable> <apihost> <workers>"
 fi
 
-EVENT_PROVIDER="$1"
-AUTH="$2"
-EDGEHOST="$3"
-DB_URL="$4"
-DB_NAME="$5"
-APIHOST="$6"
-WORKERS="$7"
+AUTH="$1"
+EDGEHOST="$2"
+DB_URL="$3"
+DB_NAME="$4"
+APIHOST="$5"
+WORKERS="$6"
 ACTION_RUNTIME_VERSION=${ACTION_RUNTIME_VERSION:="nodejs:10"}
 
 # If the auth key file exists, read the key in the file. Otherwise, take the
