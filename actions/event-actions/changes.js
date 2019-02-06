@@ -18,9 +18,10 @@ function main(msg) {
     var webparams = common.createWebParams(msg);
 
     const provider = msg.EVENT_PROVIDER
+    const provider_ns = msg.NAMESPACE
 
   // SHOULD BE GENERIC
-    var url = `https://${endpoint}/api/v1/web/${process.env['__OW_NAMESPACE']}/${provider}-web/changesWebAction.http`;
+    var url = `https://${endpoint}/api/v1/web/${provider_ns}/${provider}-web/changesWebAction.http`;
 
     if (lifecycleEvent in eventMap) {
         var method = eventMap[lifecycleEvent];

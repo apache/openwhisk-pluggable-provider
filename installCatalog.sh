@@ -21,7 +21,8 @@ EDGEHOST="$2"
 DB_URL="$3"
 DB_NAME="$4"
 APIHOST="$5"
-WORKERS="$6"
+NAMESPACE="$6"
+WORKERS="$7"
 ACTION_RUNTIME_VERSION=${ACTION_RUNTIME_VERSION:="nodejs:10"}
 
 # If the auth key file exists, read the key in the file. Otherwise, take the
@@ -45,16 +46,19 @@ fi
 # Make sure that the EVENT_PROVIDER is not empty.
 : ${EVENT_PROVIDER:?"EVENT_PROVIDER must be set and non-empty"}
 
+# Make sure that the NAMESPACE is not empty.
+: ${NAMESPACE:?"NAMESPACE must be set and non-empty"}
 PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export WSK_CONFIG_FILE= # override local property file to avoid namespace clashes
 
 echo Installing Event Provider package.
 
-$WSK_CLI -i --apihost "$EDGEHOST" package update --auth "$AUTH" --shared yes $EVENT_PROVIDER \
+$WSK_CLI -i --apihost "$EDGEHOST" package update --auth "$AUTH" --shared yes /$NAMESPACE/$EVENT_PROVIDER \
     -a description "$EVENT_PROVIDER service" \
     -a parameters '[  {"name":"bucket", "required":false, "bindTime":true, "description": "Your Cloudant username"}, {"name":"password", "required":false, "type":"password", "bindTime":true, "description": "Your Cloudant password"}, {"name":"host", "required":true, "bindTime":true, "description": "This is usually your username.cloudant.com"}, {"name":"iamApiKey", "required":false}, {"name":"iamUrl", "required":false}, {"name":"dbname", "required":false, "description": "The name of your Cloudant database"}, {"name":"overwrite", "required":false, "type": "boolean"} ]' \
     -p EVENT_PROVIDER $EVENT_PROVIDER \
+    -p NAMESPACE $NAMESPACE \
     -p apihost "$APIHOST"
 
 # make changesFeed.zip
@@ -67,7 +71,7 @@ fi
 cp -f changesFeed_package.json package.json
 zip -r changesFeed.zip lib package.json changes.js
 
-$WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" $EVENT_PROVIDER/changes "$PACKAGE_HOME/actions/event-actions/changesFeed.zip" \
+$WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" /$NAMESPACE/$EVENT_PROVIDER/changes "$PACKAGE_HOME/actions/event-actions/changesFeed.zip" \
     -t 90000 \
     -a feed true \
     -a description 'Event provider change feed' \
@@ -76,7 +80,7 @@ $WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION"
 
 WEB="-web"
 
-COMMAND=" -i --apihost $EDGEHOST package update --auth $AUTH --shared no $EVENT_PROVIDER$WEB \
+COMMAND=" -i --apihost $EDGEHOST package update --auth $AUTH --shared no /$NAMESPACE/$EVENT_PROVIDER$WEB \
      -p DB_URL $DB_URL \
      -p DB_NAME $DB_NAME \
      -p EVENT_PROVIDER $EVENT_PROVIDER \
@@ -99,6 +103,6 @@ fi
 
 zip -r changesWebAction.zip lib package.json changesWebAction.js node_modules
 
-$WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" $EVENT_PROVIDER$WEB/changesWebAction "$PACKAGE_HOME/actions/event-actions/changesWebAction.zip" \
+$WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" /$NAMESPACE/$EVENT_PROVIDER$WEB/changesWebAction "$PACKAGE_HOME/actions/event-actions/changesWebAction.zip" \
     -a description 'Create/Delete Event triggers in provider database' \
     --web true

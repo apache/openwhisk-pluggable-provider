@@ -88,7 +88,7 @@ $ npm start
 Once the provider is running, install the feed provider actions by running the following command: 
 
 ```
-./installCatalog.sh <authkey> <edgehost> <dburl> <dbprefix> <apihost> 
+./installCatalog.sh <authkey> <edgehost> <dburl> <dbprefix> <apihost> <namespace>
 ```
 
 - `<authkey>` - OpenWhisk authentication key.
@@ -96,12 +96,13 @@ Once the provider is running, install the feed provider actions by running the f
 - `<dburl>` - Trigger DB Cloudant URL.
 - `<dbname>`- Trigger DB table name.
 - `<apihost>`  - OpenWhisk hostname for firing triggers.
+- `<namespace>` - OpenWhisk namespace to install provider action packages 
 
 ### actions
 
 Running the script will result in the following actions being installed.
 
-- `/_/<EVENT_PROVIDER>/changes` 
-- `/_/<EVENT_PROVIDER>-web/changesWebAction` 
+- `/<NAMESPACE>/<EVENT_PROVIDER>/changes` 
+- `/<NAMESPACE>/<EVENT_PROVIDER>-web/changesWebAction` 
 
 The `changes` action is used to handle the incoming [trigger feed requests](https://github.com/apache/incubator-openwhisk/blob/master/docs/feeds.md). Trigger feeds events are passed to the `changesWebAction` which interfaces with the Trigger DB table. Changes to this table are listened to by the event provider, which calls the plugin to handle adding and removing trigger event sources.
