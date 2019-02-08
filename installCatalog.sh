@@ -95,7 +95,7 @@ $WSK_CLI $COMMAND
 # make changesWebAction.zip
 cp -f changesWeb_package.json package.json
 npm install
-npm link $EVENT_PROVIDER
+npm install $EVENT_PROVIDER
 
 if [ -e changesWebAction.zip ]; then
     rm -rf changesWebAction.zip

@@ -1,4 +1,4 @@
-# OpenWhisk Pluggable Event Provider
+# Apache OpenWhisk Pluggable Event Provider
 
 This projects contains a pluggable trigger feed event provider for Apache OpenWhisk. It has a plugin architecture that allows event sources to be integrated without having to re-write or maintain generic boilerplate. Event sources just need to implement a simple interface, exposed as a Node.js module.
 
@@ -58,13 +58,13 @@ Upon unrecoverable errors from the external event source, e.g. authentication is
 
 This pluggable provider uses an environment variable (`EVENT_PROVIDER`) to dynamically define the Node.js module name for the event provider plugin.
 
-### npm link
+### npm install
 
-Use `npm link` to expose the local event provider's plugin directory as an installable NPM module.
+Use `npm install` to install the event provider plugin from NPM before starting the provider.
 
 ```
-cd ~/code/my-event-provider
-npm link 
+cd provider
+npm install <EVENT_PROVIDER_NPM_PACKAGE>  
 ```
 
 ### environment variables
