@@ -6,6 +6,7 @@ var safeStringify = require('json-stringify-safe');
 var logger = new winston.Logger({
     transports: [
         new winston.transports.Console({
+            level: process.env.LOG_LEVEL || 'info',
             timestamp: function() {
                 return moment.utc().format("YYYY-MM-DDTHH:mm:ss.SSS") + 'Z';
             },

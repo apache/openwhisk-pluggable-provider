@@ -1,4 +1,4 @@
-const TRIGGER_DB_SUFFIX = 'cloudanttrigger';
+const DEFAULT_TRIGGERS_DB = 'triggers_db';
 const DEFAULT_MAX_TRIGGERS = -1;
 const RETRY_ATTEMPTS = 12;
 const RETRY_DELAY = 1000; //in milliseconds
@@ -12,7 +12,7 @@ const MONITOR_INTERVAL = 5 * 1000 * 60; //in milliseconds
 
 
 module.exports = {
-    TRIGGER_DB_SUFFIX: TRIGGER_DB_SUFFIX,
+    DEFAULT_TRIGGERS_DB: DEFAULT_TRIGGERS_DB,
     DEFAULT_MAX_TRIGGERS: DEFAULT_MAX_TRIGGERS,
     RETRY_ATTEMPTS: RETRY_ATTEMPTS,
     RETRY_DELAY: RETRY_DELAY,

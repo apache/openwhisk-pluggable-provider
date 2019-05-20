@@ -73,8 +73,9 @@ Before starting the provider application, define the following environment varia
 
 - `EVENT_PROVIDER` - NPM module name for event provider plugin.
 - `DB_URL` - Trigger DB Cloudant URL.
-- `DB_PREFIX` - Trigger DB table prefix.
+- `TRIGGERS_DB` - Trigger DB table name.
 - `ROUTER_HOST` - OpenWhisk platform hostname.
+- (Optional) `LOG_LEVEL` - Set logging level (defaults to `info`)
 
 ### running feed provider
 
@@ -97,6 +98,12 @@ Once the provider is running, install the feed provider actions by running the f
 - `<dbname>`- Trigger DB table name.
 - `<apihost>`  - OpenWhisk hostname for firing triggers.
 - `<namespace>` - OpenWhisk namespace to install provider action packages 
+
+*The `WSK_CLI` environment variable must refer to the compiled instance of the [Apache OpenWhisk CLI](https://github.com/apache/incubator-openwhisk-cli).*
+
+### optional parameters
+
+If the `EVENT_PROVIDER_LIB` environment variable is set, this will be used as the explicit location to install the event provider library from. This can be used to install from a non-published version of the library, i.e. on the filesystem or a Github repository. If this value is not set, the library will be installed from NPM using the `EVENT_PROVIDER` library name.
 
 ### actions
 

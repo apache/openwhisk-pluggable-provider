@@ -1,64 +1,66 @@
 'use strict';
+
 /**
  * Service which can be configured to listen for triggers from a provider.
  * The Provider will store, invoke, and POST whisk events appropriately.
  */
-var URL = require('url').URL;
-var http = require('http');
-var express = require('express');
-var bodyParser = require('body-parser');
-var bluebird = require('bluebird');
-var logger = require('./Logger');
+const URL = require('url').URL;
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+const bluebird = require('bluebird');
+const Cloudant = require('@cloudant/cloudant')
+const redis = require('redis')
+bluebird.promisifyAll(redis.RedisClient.prototype);
+const logger = require('./Logger');
 
-//var ProviderUtils = require('./lib/utils.js');
-var ProviderTriggersManager = require('./lib/triggers_manager.js');
-var ProviderHealth = require('./lib/health.js');
-var ProviderRAS = require('./lib/ras.js');
-var ProviderActivation = require('./lib/active.js');
-var constants = require('./lib/constants.js');
+const ProviderTriggersManager = require('./lib/triggers_manager.js');
+const ProviderHealth = require('./lib/health.js');
+const ProviderRAS = require('./lib/ras.js');
+const ProviderActivation = require('./lib/active.js');
+const constants = require('./lib/constants.js');
 
 // Initialize the Express Application
-var app = express();
+const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('port', process.env.PORT || 8080);
 
-// Allow invoking servers with self-signed certificates.
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+if (!process.env.DB_URL) {
+  throw new Error('Missing DB_URL environment parameter.')
+}
 
-// If it does not already exist, create the triggers database.  This is the database that will
-// store the managed triggers.
-var dbUrl = process.env.DB_URL;
-var dbPrefix = process.env.DB_PREFIX;
-var databaseName = dbPrefix + constants.TRIGGER_DB_SUFFIX;
-// OPTIONAL
-var redisUrl = process.env.REDIS_URL;
+const dbUrl = process.env.DB_URL;
+// This is the database that will store the managed triggers.
+const databaseName = process.env.TRIGGERS_DB || constants.DEFAULT_TRIGGERS_DB;
 
-// OPTIONAL
-var monitoringAuth = process.env.MONITORING_AUTH;
-var monitoringInterval = process.env.MONITORING_INTERVAL || constants.MONITOR_INTERVAL;
+// Optional Configuration Parameters
+const redisUrl = process.env.REDIS_URL;
 
-var filterDDName = '_design/' + constants.FILTERS_DESIGN_DOC;
-var viewDDName = '_design/' + constants.VIEWS_DESIGN_DOC;
+// Optional Configuration Parameters
+const monitoringAuth = process.env.MONITORING_AUTH;
+const monitoringInterval = process.env.MONITORING_INTERVAL || constants.MONITOR_INTERVAL;
+
+const filterDDName = '_design/' + constants.FILTERS_DESIGN_DOC;
+const viewDDName = '_design/' + constants.VIEWS_DESIGN_DOC;
 
 if (!process.env.EVENT_PROVIDER) {
-  throw new Exception('Missing EVENT_PROVIDER environment parameter.')
+  throw new Error('Missing EVENT_PROVIDER environment parameter.')
 }
 
 const EventProvider = require(process.env.EVENT_PROVIDER)
 
 // Create the Provider Server
-var server = http.createServer(app);
+const server = http.createServer(app);
 server.listen(app.get('port'), function() {
     logger.info('server.listen', 'Express server listening on port ' + app.get('port'));
 });
 
 function createDatabase() {
-    var method = 'createDatabase';
-    logger.info(method, 'creating the trigger database');
+    const method = 'createDatabase';
+    logger.info(method, 'creating the trigger database', dbUrl);
 
-    console.log(dbUrl);
-    var cloudant = require('@cloudant/cloudant')(dbUrl);
+    const cloudant = Cloudant(dbUrl);
 
     if (cloudant !== null) {
         return new Promise(function (resolve, reject) {
@@ -70,7 +72,7 @@ function createDatabase() {
                     logger.info(method, 'failed to create trigger database:', databaseName, err);
                 }
 
-                var viewDD = {
+                const viewDD = {
                     views: {
                         triggers_by_worker: {
                             map: function (doc) {
@@ -85,7 +87,7 @@ function createDatabase() {
 
                 createDesignDoc(cloudant.db.use(databaseName), viewDDName, viewDD)
                 .then(db => {
-                    var filterDD = {
+                    const filterDD = {
                         filters: {
                             triggers_by_worker:
                                 function (doc, req) {
@@ -98,7 +100,7 @@ function createDatabase() {
                 })
                 .then(db => {
                     if (monitoringAuth) {
-                        var filterDD = {
+                        const filterDD = {
                             filters: {
                                 canary_docs:
                                     function (doc, req) {
@@ -128,7 +130,7 @@ function createDatabase() {
 }
 
 function createDesignDoc(db, ddName, designDoc) {
-    var method = 'createDesignDoc';
+    const method = 'createDesignDoc';
 
     return new Promise(function(resolve, reject) {
 
@@ -153,13 +155,11 @@ function createDesignDoc(db, ddName, designDoc) {
 }
 
 function createRedisClient() {
-    var method = 'createRedisClient';
+    const method = 'createRedisClient';
 
     return new Promise(function(resolve, reject) {
         if (redisUrl) {
-            var client;
-            var redis = require('redis');
-            bluebird.promisifyAll(redis.RedisClient.prototype);
+            let client;
             if (redisUrl.startsWith('rediss://')) {
                 // If this is a rediss: connection, we have some other steps.
                 client = redis.createClient(redisUrl, {
@@ -189,12 +189,12 @@ function createRedisClient() {
 
 // Initialize the Provider Server
 function init(server, EventProvider) {
-    var method = 'init';
-    var cloudantDb;
-    var providerTriggersManager;
+    const method = 'init';
+    let cloudantDb;
+    let providerTriggersManager;
 
     if (server !== null) {
-        var address = server.address();
+        const address = server.address();
         if (address === null) {
             logger.error(method, 'Error initializing server. Perhaps port is already in use.');
             process.exit(-1);
@@ -211,9 +211,9 @@ function init(server, EventProvider) {
         return providerTriggersManager.initRedis();
     })
     .then(() => {
-        var providerRAS = new ProviderRAS();
-        var providerHealth = new ProviderHealth(logger, providerTriggersManager);
-        var providerActivation = new ProviderActivation(logger, providerTriggersManager);
+        const providerRAS = new ProviderRAS();
+        const providerHealth = new ProviderHealth(logger, providerTriggersManager);
+        const providerActivation = new ProviderActivation(logger, providerTriggersManager);
 
         // RAS Endpoint
         app.get(providerRAS.endPoint, providerRAS.ras);
@@ -235,7 +235,6 @@ function init(server, EventProvider) {
     .catch(err => {
         logger.error(method, 'an error occurred creating database:', err);
     });
-
 }
 
 init(server, EventProvider);
