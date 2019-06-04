@@ -26,11 +26,11 @@ function requestHelper(url, input, method) {
             }
             else {
                 if (response) {
-                    console.log('cloudant: Error invoking whisk action:', response.statusCode, body);
+                    console.log('pluggableProvider: Error invoking whisk action:', response.statusCode, body);
                     reject(body);
                 }
                 else {
-                    console.log('cloudant: Error invoking whisk action:', error);
+                    console.log('pluggableProvider: Error invoking whisk action:', error);
                     reject(error);
                 }
             }

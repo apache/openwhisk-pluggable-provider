@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "node app.js",
-    "start-local": "npm link $EVENT_PROVIDER && node app.js"
+    "start-local": "npm link $EVENT_PROVIDER && node app.js",
+    "test": "ava tests/index.js" 
   },
   "dependencies": {
     "@cloudant/cloudant": "3.0.0",
@@ -23,5 +24,9 @@
     "request-promise": "^1.0.2",
     "systeminformation": "^3.19.0",
     "winston": "^2.1.1"
+  },
+  "devDependencies": {
+    "ava": "^2.0.0",
+    "openwhisk": "^3.19.0"
   }
 }

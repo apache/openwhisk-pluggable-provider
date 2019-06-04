@@ -56,7 +56,6 @@ echo Installing Event Provider package.
 
 $WSK_CLI -i --apihost "$EDGEHOST" package update --auth "$AUTH" --shared yes /$NAMESPACE/$EVENT_PROVIDER \
     -a description "$EVENT_PROVIDER service" \
-    -a parameters '[  {"name":"bucket", "required":false, "bindTime":true, "description": "Your Cloudant username"}, {"name":"password", "required":false, "type":"password", "bindTime":true, "description": "Your Cloudant password"}, {"name":"host", "required":true, "bindTime":true, "description": "This is usually your username.cloudant.com"}, {"name":"iamApiKey", "required":false}, {"name":"iamUrl", "required":false}, {"name":"dbname", "required":false, "description": "The name of your Cloudant database"}, {"name":"overwrite", "required":false, "type": "boolean"} ]' \
     -p EVENT_PROVIDER $EVENT_PROVIDER \
     -p NAMESPACE $NAMESPACE \
     -p apihost "$APIHOST"
@@ -74,9 +73,7 @@ zip -r changesFeed.zip lib package.json changes.js
 $WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" /$NAMESPACE/$EVENT_PROVIDER/changes "$PACKAGE_HOME/actions/event-actions/changesFeed.zip" \
     -t 90000 \
     -a feed true \
-    -a description 'Event provider change feed' \
-    -a parameters '[ {"name":"dbname", "required":true, "updatable":false}, {"name":"iamApiKey", "required":false, "updatable":false}, {"name":"iamUrl", "required":false, "updatable":false}, {"name": "filter", "required":false, "updatable":true, "type": "string", "description": "The name of your Cloudant database filter"}, {"name": "query_params", "required":false, "updatable":true, "description": "JSON Object containing query parameters that are passed to the filter"} ]' \
-    -a sampleInput '{ "dbname": "mydb", "filter": "mailbox/by_status", "query_params": {"status": "new"} }'
+    -a description 'Event provider change feed'
 
 WEB="-web"
 

@@ -1,0 +1,11 @@
+{
+  "name": "noop-trigger-feed",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "James Thomas <james@jamesthom.as> (https://jamesthom.as)",
+  "license": "Apache-2.0"
+}

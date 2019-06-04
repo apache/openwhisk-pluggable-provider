@@ -71,9 +71,9 @@ module.exports = function(logger, utils) {
             deleteDocFromDB(existingCanaryID, 0);
         }
 
-        //create new cloudant trigger and canary doc
+        //create new trigger and canary doc
         var docSuffix = utils.worker + utils.host + '_' + Date.now();
-        triggerName = 'cloudant_' + docSuffix;
+        triggerName = 'pluggable_provider_' + docSuffix;
         canaryDocID = 'canary_' + docSuffix;
 
         //update status monitor object
@@ -212,5 +212,4 @@ module.exports = function(logger, utils) {
             }
         });
     }
-
 };

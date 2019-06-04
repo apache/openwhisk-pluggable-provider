@@ -53,7 +53,7 @@ module.exports = function(dbURL, dbName) {
                     resolve();
                 }
                 else {
-                    reject(common.sendError(err.statusCode, 'error creating cloudant trigger.', err.message));
+                    reject(common.sendError(err.statusCode, 'error creating plugin provider trigger.', err.message));
                 }
             });
         });

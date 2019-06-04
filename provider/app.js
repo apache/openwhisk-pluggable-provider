@@ -125,7 +125,7 @@ function createDatabase() {
         });
     }
     else {
-        Promise.reject('cloudant provider did not get created.  check db URL: ' + dbUrl);
+        Promise.reject('pluggable feed provider did not get created.  check db URL: ' + dbUrl);
     }
 }
 

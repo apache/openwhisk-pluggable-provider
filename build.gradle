@@ -1,2 +1,2 @@
-ext.dockerImageName = 'catalog_cloudanttrigger'
+ext.dockerImageName = 'pluggable_feed_provider'
 apply from: 'gradle/docker.gradle'
