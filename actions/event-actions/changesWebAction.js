@@ -36,7 +36,7 @@ function main(params) {
           common.verifyTriggerAuth(triggerData, false)
             .then(() => EventProvider.validate(params))
             .catch(err => {
-              return reject(common.sendError(400, `Feed parameter validation failed`, err.message));
+              throw common.sendError(400, `Feed parameter validation failed`, err.message);
             })
             .then(validParams => {
                 Object.assign(newTrigger, validParams)
@@ -79,7 +79,6 @@ function main(params) {
             .catch(reject)
         });
     }
-    // HOW TO UPDATE?
     else if (params.__ow_method === "put") {
 
         return new Promise(function (resolve, reject) {
@@ -88,7 +87,7 @@ function main(params) {
             common.verifyTriggerAuth(triggerData, false)
             .then(() => EventProvider.validate(params))
             .catch(err => {
-              return reject(common.sendError(400, `Feed parameter validation failed`, err.message));
+              throw common.sendError(400, `Feed parameter validation failed`, err.message);
             })
             .then(validParams => {
                 Object.assign(updatedParams, validParams)
@@ -96,7 +95,7 @@ function main(params) {
             .then(() => db.getTrigger(triggerID))
             .then(trigger => {
                 if (trigger.status && trigger.status.active === false) {
-                    return reject(common.sendError(400, `${params.triggerName} cannot be updated because it is disabled`));
+                    throw common.sendError(400, `${params.triggerName} cannot be updated because it is disabled`);
                 }
                 return db.disableTrigger(triggerID, trigger, 0, 'updating');
             })

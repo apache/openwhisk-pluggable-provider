@@ -47,81 +47,6 @@ module.exports = function(logger, triggerDB, EventProvider, redisClient) {
         });
     };
 
-    // Add a trigger: listen for changes and dispatch.
-  /**
-    this.createTrigger = function(triggerData) {
-        var method = 'createTrigger';
-
-        var Cloudant = require('@cloudant/cloudant');
-        var cloudantConnection;
-
-        if (triggerData.iamApiKey) {
-            var dbURL = `${triggerData.protocol}://${triggerData.host}`;
-            if (triggerData.port) {
-                dbURL += ':' + triggerData.port;
-            }
-            cloudantConnection = new Cloudant({ url: dbURL, plugins: { iamauth: { iamApiKey: triggerData.iamApiKey, iamTokenUrl: triggerData.iamUrl } } });
-        }
-        else {
-            var url = `${triggerData.protocol}://${triggerData.user}:${triggerData.pass}@${triggerData.host}`;
-            if (triggerData.port) {
-                url += ':' + triggerData.port;
-            }
-            cloudantConnection = Cloudant(url);
-        }
-
-        try {
-            var triggeredDB = cloudantConnection.use(triggerData.dbname);
-
-            // Listen for changes on this database.
-            var feed = triggeredDB.follow({since: triggerData.since, include_docs: false});
-            if (triggerData.filter) {
-                feed.filter = triggerData.filter;
-            }
-            if (triggerData.query_params) {
-                feed.query_params = triggerData.query_params;
-            }
-
-            triggerData.feed = feed;
-            self.triggers[triggerData.id] = triggerData;
-
-            feed.on('change', function (change) {
-                var triggerHandle = self.triggers[triggerData.id];
-                if (triggerHandle && shouldFireTrigger(triggerHandle) && hasTriggersRemaining(triggerHandle)) {
-                    logger.info(method, 'Trigger', triggerData.id, 'got change from', triggerData.dbname);
-                    try {
-                        fireTrigger(triggerData.id, change);
-                    } catch (e) {
-                        logger.error(method, 'Exception occurred while firing trigger', triggerData.id, e);
-                    }
-                }
-            });
-
-            feed.follow();
-
-            return new Promise(function(resolve, reject) {
-                feed.on('error', function (err) {
-                    logger.error(method,'Error occurred for trigger', triggerData.id, '(db ' + triggerData.dbname + '):', err);
-                    reject(err);
-                });
-
-                feed.on('confirm', function () {
-                    logger.info(method, 'Added cloudant data trigger', triggerData.id, 'listening for changes in database', triggerData.dbname);
-                    if (isMonitoringTrigger(triggerData.monitor, triggerData.id)) {
-                        self.monitorStatus.triggerStarted = "success";
-                    }
-                    resolve(triggerData.id);
-                });
-            });
-
-        } catch (err) {
-            logger.info(method, 'caught an exception for trigger', triggerData.id, err);
-            return Promise.reject(err);
-        }
-
-    };
-*/
-
     function initTrigger(newTrigger) {
       const maxTriggers = newTrigger.maxTriggers || constants.DEFAULT_MAX_TRIGGERS;
         
@@ -218,7 +143,7 @@ module.exports = function(logger, triggerDB, EventProvider, redisClient) {
         var host = 'https://' + self.routerHost;
         var uri = host + '/api/v1/namespaces/' + triggerObj.namespace + '/triggers/' + triggerObj.name;
 
-        postTrigger(triggerData, form, uri, 0)
+        return postTrigger(triggerData, form, uri, 0)
         .then(triggerId => {
             logger.info(method, 'Trigger', triggerId, 'was successfully fired');
             if (isMonitoringTrigger(triggerData.monitor, triggerId)) {
@@ -236,6 +161,7 @@ module.exports = function(logger, triggerDB, EventProvider, redisClient) {
         })
         .catch(err => {
             logger.error(method, err);
+            throw err
         });
     }
 

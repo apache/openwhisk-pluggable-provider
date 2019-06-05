@@ -9,8 +9,7 @@
 set -e
 set -x
 
-: ${OPENWHISK_HOME:?"OPENWHISK_HOME must be set and non-empty"}
-WSK_CLI="$OPENWHISK_HOME/bin/wsk"
+: ${WSK_CLI:?"WSK_CLI must be set and non-empty"}
 
 if [ $# -eq 0 ]; then
     echo "Usage: ./installCatalog.sh <authkey> <edgehost> <dburl> <dbtable> <apihost> <workers>"
@@ -24,6 +23,7 @@ APIHOST="$5"
 NAMESPACE="$6"
 WORKERS="$7"
 ACTION_RUNTIME_VERSION=${ACTION_RUNTIME_VERSION:="nodejs:10"}
+EVENT_PROVIDER_LIB=${EVENT_PROVIDER_LIB:=$EVENT_PROVIDER}
 
 # If the auth key file exists, read the key in the file. Otherwise, take the
 # first argument as the key itself.
@@ -95,7 +95,7 @@ $WSK_CLI $COMMAND
 # make changesWebAction.zip
 cp -f changesWeb_package.json package.json
 npm install
-npm install $EVENT_PROVIDER
+npm install $EVENT_PROVIDER_LIB
 
 if [ -e changesWebAction.zip ]; then
     rm -rf changesWebAction.zip
