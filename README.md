@@ -113,3 +113,39 @@ Running the script will result in the following actions being installed.
 - `/<NAMESPACE>/<EVENT_PROVIDER>-web/changesWebAction` 
 
 The `changes` action is used to handle the incoming [trigger feed requests](https://github.com/apache/incubator-openwhisk/blob/master/docs/feeds.md). Trigger feeds events are passed to the `changesWebAction` which interfaces with the Trigger DB table. Changes to this table are listened to by the event provider, which calls the plugin to handle adding and removing trigger event sources.
+
+## Testing
+
+Systems tests are available which verifies the following behaviour for the pluggable feed provider:
+
+- Register new triggers for an example feed.
+- Retrieve details of registered triggers. 
+- Fire triggers on external events.
+- Allow removal of registered triggers.
+
+### Setup
+
+These tests use an example "no-op" feed plugin, which fires a single event after trigger registration. This code is available in the `./provider/tests/resources/noop-trigger-feed` directory. Before running the tests, make sure the feed actions have been installed into an instance of the platform using this plugin as the event provider. The provider backend also needs running with this plugin.
+
+The following environment variables need defining before the tests can be executed.
+
+- `OW_NOOP_FEED`: trigger feed action identifier (e.g. `/<NS>/noop-trigger-feed/changes`)
+- `OW_APIHOST`: Apache OpenWhisk platform hostname.
+- `OW_API_KEY`: API key for Apache OpenWhisk instance.
+
+### Running
+
+```
+npm test
+```
+
+The tests consist of a single test case which runs through all the behaviours above with the sample event provider plugin. If successful, the following output should be shown in the console.
+
+```
+> openwhisk-pluggable-provider@0.0.1 test ~/generic-provider/provider
+> ava tests/index.js
+
+  ✔ should be able to create trigger with pluggable provider feed source (3.2s)
+
+  1 test passed
+```

@@ -438,6 +438,7 @@ module.exports = function(logger, triggerDB, EventProvider, redisClient) {
         authHandler.handleAuth(triggerData)
         .then(auth => {
             options.auth = auth;
+            options.rejectUnauthorized = false
             request(options, cb);
         })
         .catch(err => {

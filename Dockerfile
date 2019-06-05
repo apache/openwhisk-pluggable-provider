@@ -1,13 +1,11 @@
-FROM node:8.14.0
+FROM node:10
 
-# only package.json
-ADD package.json /
-RUN cd / && npm install --production
+ADD provider /provider
 
-# App
-ADD provider/. /cloudantTrigger/
+WORKDIR /provider
+
+RUN npm install --production
 
 EXPOSE 8080
 
-# Run the app
-CMD ["/bin/bash", "-c", "node /cloudantTrigger/app.js"]
+CMD "./run.sh"

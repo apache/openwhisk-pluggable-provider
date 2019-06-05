@@ -7,10 +7,10 @@
   },
   "scripts": {
     "start": "node app.js",
-    "start-local": "npm link $EVENT_PROVIDER && node app.js"
+    "start-local": "npm link $EVENT_PROVIDER && node app.js",
+    "test": "ava tests/index.js"
   },
   "dependencies": {
-    "@cloudant/cloudant": "3.0.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.12.0",
     "express": "^4.12.2",
@@ -18,10 +18,15 @@
     "json-stringify-safe": "^5.0.1",
     "lodash": ">=4.17.5",
     "moment": "^2.11.1",
+    "nano": "^8.1.0",
     "redis": "^2.7.1",
     "request": "^2.83.0",
     "request-promise": "^1.0.2",
     "systeminformation": "^3.19.0",
     "winston": "^2.1.1"
+  },
+  "devDependencies": {
+    "ava": "^2.0.0",
+    "openwhisk": "^3.19.0"
   }
 }

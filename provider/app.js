@@ -9,7 +9,6 @@ const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const bluebird = require('bluebird');
-const Cloudant = require('@cloudant/cloudant')
 const redis = require('redis')
 bluebird.promisifyAll(redis.RedisClient.prototype);
 const logger = require('./Logger');
@@ -26,11 +25,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('port', process.env.PORT || 8080);
 
-if (!process.env.DB_URL) {
-  throw new Error('Missing DB_URL environment parameter.')
+const db_env_vars = ['DB_PROTOCOL', 'DB_HOST', 'DB_USERNAME', 'DB_PASSWORD']
+
+for (let env_var of db_env_vars) {
+  if (!process.env[env_var]) {
+    throw new Error(`Missing ${env_var} environment parameter.`)
+  }
 }
 
-const dbUrl = process.env.DB_URL;
+const dbUrl = process.env.DB_PROTOCOL + '://' + process.env.DB_USERNAME + ':' 
+  + process.env.DB_PASSWORD + '@' + process.env.DB_HOST
+
 // This is the database that will store the managed triggers.
 const databaseName = process.env.TRIGGERS_DB || constants.DEFAULT_TRIGGERS_DB;
 
@@ -60,11 +65,11 @@ function createDatabase() {
     const method = 'createDatabase';
     logger.info(method, 'creating the trigger database', dbUrl);
 
-    const cloudant = Cloudant(dbUrl);
+    const nano = require('nano')(dbUrl)
 
-    if (cloudant !== null) {
+    if (nano !== null) {
         return new Promise(function (resolve, reject) {
-            cloudant.db.create(databaseName, function (err, body) {
+            nano.db.create(databaseName, function (err, body) {
                 if (!err) {
                     logger.info(method, 'created trigger database:', databaseName);
                 }
@@ -85,7 +90,7 @@ function createDatabase() {
                     }
                 };
 
-                createDesignDoc(cloudant.db.use(databaseName), viewDDName, viewDD)
+                createDesignDoc(nano.db.use(databaseName), viewDDName, viewDD)
                 .then(db => {
                     const filterDD = {
                         filters: {
@@ -125,7 +130,7 @@ function createDatabase() {
         });
     }
     else {
-        Promise.reject('cloudant provider did not get created.  check db URL: ' + dbUrl);
+        Promise.reject('pluggable feed provider did not get created.  check db URL: ' + dbUrl);
     }
 }
 
@@ -190,7 +195,7 @@ function createRedisClient() {
 // Initialize the Provider Server
 function init(server, EventProvider) {
     const method = 'init';
-    let cloudantDb;
+    let database;
     let providerTriggersManager;
 
     if (server !== null) {
@@ -203,11 +208,11 @@ function init(server, EventProvider) {
 
     createDatabase()
     .then(db => {
-        cloudantDb = db;
+        database = db;
         return createRedisClient();
     })
     .then(client => {
-        providerTriggersManager = new ProviderTriggersManager(logger, cloudantDb, EventProvider, client);
+        providerTriggersManager = new ProviderTriggersManager(logger, database, EventProvider, client);
         return providerTriggersManager.initRedis();
     })
     .then(() => {

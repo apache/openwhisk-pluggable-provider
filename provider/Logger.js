@@ -12,7 +12,7 @@ var logger = new winston.Logger({
             },
             formatter: function(options) {
                 // Return string will be passed to logger.
-                return '[' + options.timestamp() +'] ['+ options.level.toUpperCase() +'] [??] [cloudantTrigger] ' + options.message;
+                return '[' + options.timestamp() +'] ['+ options.level.toUpperCase() +'] [??] [pluggableProviderTrigger] ' + options.message;
             }
         })
     ]

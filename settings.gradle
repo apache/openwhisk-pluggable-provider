@@ -1,6 +1,6 @@
 include 'tests'
 
-rootProject.name = 'openwhisk-package-cloudant'
+rootProject.name = 'openwhisk-pluggable-provider'
 
 gradle.ext.openwhisk = [
         version: '1.0.0-SNAPSHOT'

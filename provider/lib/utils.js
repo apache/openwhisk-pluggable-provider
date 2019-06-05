@@ -84,7 +84,7 @@ module.exports = function(logger, triggerDB, redisClient) {
                 });
 
                 feed.on('confirm', function () {
-                    logger.info(method, 'Added cloudant data trigger', triggerData.id, 'listening for changes in database', triggerData.dbname);
+                    logger.info(method, 'Added plugin provider data trigger', triggerData.id, 'listening for changes in database', triggerData.dbname);
                     if (isMonitoringTrigger(triggerData.monitor, triggerData.id)) {
                         self.monitorStatus.triggerStarted = "success";
                     }

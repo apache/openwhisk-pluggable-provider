@@ -30,12 +30,12 @@ script:
 deploy:
   # deploy latest
   - provider: script
-    script: ./tools/travis/deploy.sh openwhisk cloudantprovider latest
+    script: ./tools/travis/deploy.sh openwhisk pluggable_feed_provider latest
     on:
       branch: master
   # deploy tag
   - provider: script
-    script: ./tools/travis/deploy.sh openwhisk cloudantprovider $TRAVIS_TAG
+    script: ./tools/travis/deploy.sh openwhisk pluggable_feed_provider $TRAVIS_TAG
     on:
       tags: true
       all_branches: true

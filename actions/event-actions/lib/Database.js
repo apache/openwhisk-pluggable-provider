@@ -2,8 +2,8 @@ const common = require('./common');
 
 // constructor for DB object - a thin, promise-loving wrapper around nano
 module.exports = function(dbURL, dbName) {
-    var cloudant = require('@cloudant/cloudant')(dbURL);
-    this.db = cloudant.db.use(dbName);
+    var nano = require('nano')(dbURL);
+    this.db = nano.db.use(dbName);
     var utilsDB = this;
 
     this.getWorkerID = function(availabeWorkers) {
@@ -53,7 +53,7 @@ module.exports = function(dbURL, dbName) {
                     resolve();
                 }
                 else {
-                    reject(common.sendError(err.statusCode, 'error creating cloudant trigger.', err.message));
+                    reject(common.sendError(err.statusCode, 'error creating plugin provider trigger.', err.message));
                 }
             });
         });
