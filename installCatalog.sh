@@ -68,7 +68,8 @@ if [ -e changesFeed.zip ]; then
 fi
 
 cp -f changesFeed_package.json package.json
-zip -r changesFeed.zip lib package.json changes.js
+npm install
+zip -r changesFeed.zip lib package.json changes.js node_modules
 
 $WSK_CLI -i --apihost "$EDGEHOST" action update --kind "$ACTION_RUNTIME_VERSION" --auth "$AUTH" /$NAMESPACE/$EVENT_PROVIDER/changes "$PACKAGE_HOME/actions/event-actions/changesFeed.zip" \
     -t 90000 \

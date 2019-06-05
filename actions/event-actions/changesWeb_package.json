@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "changesWebAction.js",
   "dependencies" : {
-    "@cloudant/cloudant": "3.0.0"
+    "nano": "^8.1.0",
+    "moment": "^2.24.0",
+    "request": "^2.88.0"
   }
 }
