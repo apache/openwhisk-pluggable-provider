@@ -1,3 +1,22 @@
+<!--
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+-->
+
 # Apache OpenWhisk Pluggable Event Provider
 
 This projects contains a pluggable trigger feed event provider for Apache OpenWhisk. It has a plugin architecture that allows event sources to be integrated without having to re-write or maintain generic boilerplate. Event sources just need to implement a simple interface, exposed as a Node.js module.
@@ -6,7 +25,7 @@ This event provider handles all the trigger registration, monitoring and managem
 
 ## Plugin Interface
 
-Plugins must expose a Node.js module with the following methods. 
+Plugins must expose a Node.js module with the following methods.
 
 ```javascript
 // initialise plugin instance (must be a JS constructor)
@@ -64,12 +83,12 @@ Use `npm install` to install the event provider plugin from NPM before starting 
 
 ```
 cd provider
-npm install <EVENT_PROVIDER_NPM_PACKAGE>  
+npm install <EVENT_PROVIDER_NPM_PACKAGE>
 ```
 
 ### environment variables
 
-Before starting the provider application, define the following environment variables. 
+Before starting the provider application, define the following environment variables.
 
 - `EVENT_PROVIDER` - NPM module name for event provider plugin.
 - `DB_URL` - Trigger DB Cloudant URL.
@@ -86,7 +105,7 @@ $ npm start
 
 ## Installing Feed Provider Actions
 
-Once the provider is running, install the feed provider actions by running the following command: 
+Once the provider is running, install the feed provider actions by running the following command:
 
 ```
 ./installCatalog.sh <authkey> <edgehost> <dburl> <dbprefix> <apihost> <namespace>
@@ -97,7 +116,7 @@ Once the provider is running, install the feed provider actions by running the f
 - `<dburl>` - Trigger DB Cloudant URL.
 - `<dbname>`- Trigger DB table name.
 - `<apihost>`  - OpenWhisk hostname for firing triggers.
-- `<namespace>` - OpenWhisk namespace to install provider action packages 
+- `<namespace>` - OpenWhisk namespace to install provider action packages
 
 *The `WSK_CLI` environment variable must refer to the compiled instance of the [Apache OpenWhisk CLI](https://github.com/apache/incubator-openwhisk-cli).*
 
@@ -109,8 +128,8 @@ If the `EVENT_PROVIDER_LIB` environment variable is set, this will be used as th
 
 Running the script will result in the following actions being installed.
 
-- `/<NAMESPACE>/<EVENT_PROVIDER>/changes` 
-- `/<NAMESPACE>/<EVENT_PROVIDER>-web/changesWebAction` 
+- `/<NAMESPACE>/<EVENT_PROVIDER>/changes`
+- `/<NAMESPACE>/<EVENT_PROVIDER>-web/changesWebAction`
 
 The `changes` action is used to handle the incoming [trigger feed requests](https://github.com/apache/incubator-openwhisk/blob/master/docs/feeds.md). Trigger feeds events are passed to the `changesWebAction` which interfaces with the Trigger DB table. Changes to this table are listened to by the event provider, which calls the plugin to handle adding and removing trigger event sources.
 
@@ -119,7 +138,7 @@ The `changes` action is used to handle the incoming [trigger feed requests](http
 Systems tests are available which verifies the following behaviour for the pluggable feed provider:
 
 - Register new triggers for an example feed.
-- Retrieve details of registered triggers. 
+- Retrieve details of registered triggers.
 - Fire triggers on external events.
 - Allow removal of registered triggers.
 
