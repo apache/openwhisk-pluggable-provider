@@ -19,7 +19,6 @@
     "lodash": ">=4.17.5",
     "moment": "^2.11.1",
     "nano": "^8.1.0",
-    "openwhisk-redis-trigger-feed": "file:../../../jthomas/openwhisk-redis-trigger-feed",
     "redis": "^2.7.1",
     "request": "^2.83.0",
     "request-promise": "^1.0.2",
