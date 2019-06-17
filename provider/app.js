@@ -50,7 +50,7 @@ for (let env_var of db_env_vars) {
   }
 }
 
-const dbUrl = process.env.DB_PROTOCOL + '://' + process.env.DB_USERNAME + ':' 
+const dbUrl = process.env.DB_PROTOCOL + '://' + process.env.DB_USERNAME + ':'
   + process.env.DB_PASSWORD + '@' + process.env.DB_HOST
 
 // This is the database that will store the managed triggers.
