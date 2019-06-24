@@ -39,10 +39,6 @@ pip install --user jsonschema
 # Ansible
 pip install --user ansible==2.1.2.0
 
-# jshint support
-sudo apt-get -y install nodejs npm
-sudo npm install -g jshint
-
 # clone OpenWhisk repo. in order to run scanCode.py
 cd $HOMEDIR
 git clone https://github.com/apache/incubator-openwhisk-utilities.git

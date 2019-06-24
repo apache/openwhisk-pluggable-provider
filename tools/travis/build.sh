@@ -27,7 +27,3 @@ UTILDIR="$ROOTDIR/../incubator-openwhisk-utilities"
 # run scancode
 cd $UTILDIR
 scancode/scanCode.py $ROOTDIR
-
-# run jshint
-cd $ROOTDIR
-jshint --exclude tests .
