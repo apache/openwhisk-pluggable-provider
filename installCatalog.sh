@@ -24,7 +24,8 @@
 set -e
 set -x
 
-: ${WSK_CLI:?"WSK_CLI must be set and non-empty"}
+: ${OPENWHISK_HOME:?"OPENWHISK_HOME must be set and non-empty"}
+WSK_CLI="$OPENWHISK_HOME/bin/wsk"
 
 if [ $# -eq 0 ]; then
     echo "Usage: ./installCatalog.sh <authkey> <edgehost> <dburl> <dbtable> <apihost> <workers>"
