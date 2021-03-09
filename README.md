@@ -19,7 +19,7 @@
 
 # Apache OpenWhisk Pluggable Event Provider
 
-This projects contains a pluggable trigger feed event provider for Apache OpenWhisk. It has a plugin architecture that allows event sources to be integrated without having to re-write or maintain generic boilerplate. Event sources just need to implement a simple interface, exposed as a Node.js module.
+This project contains a pluggable trigger feed event provider for Apache OpenWhisk. It has a plugin architecture that allows event sources to be integrated without having to re-write or maintain generic boilerplate. Event sources just need to implement a simple interface, exposed as a Node.js module.
 
 This event provider handles all the trigger registration, monitoring and management services, leaving the event source plugin to handle listening to the external event source and firing events. It based off the Cloudant trigger feed package.
 
@@ -50,14 +50,14 @@ Upon starting the Pluggable Event Provider, the event provider plugin (provided 
 
 The `trigger_manager` parameter exposes two async functions:
 
-- ` fireTrigger(id, params)` - fire trigger given by id passed into `add` method with event parameters.
+- ` fireTrigger(id, params)` - fire trigger given by the id passed into `add` method with event parameters.
 - `disableTrigger(id, status_code, message)` - disable trigger feed due to external event source issues.
 
 Both functions handle the retry logic and error handling for those operations. These should be used by the event provider plugin to fire triggers when events arrive from external sources and then disable triggers due to external event source issues.
 
 ### adding triggers
 
-When a new trigger is added to the trigger feeds' database, the details will be passed to the `add` method. Trigger parameters will be used to set up listening to the external event source. When external events occur, the `trigger_manager` can be use to automatically fire triggers.
+When a new trigger is added to the trigger feeds' database, the details will be passed to the `add` method. Trigger parameters will be used to set up listening to the external event source. When external events occur, the `trigger_manager` can be used to automatically fire triggers.
 
 ### removing triggers
 
